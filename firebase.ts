@@ -1,45 +1,28 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { getDatabase, ref, onValue, set, DatabaseReference, Database, DataSnapshot } from "firebase/database";
+import { Tokens } from "interfaces";
+
 const firebaseConfig = {
     databaseURL:
         "https://rocket-test-2933b-default-rtdb.europe-west1.firebasedatabase.app/",
 };
 
-const app = initializeApp(firebaseConfig)
-export const database = getDatabase(app);
-
-interface Tokens {
-    access_token: string;
-    refresh_token: string;
-}
+const app: FirebaseApp = initializeApp(firebaseConfig);
+export const database: Database = getDatabase(app);
 
 export let tokens: Tokens = {
     access_token: null,
     refresh_token: null
 };
 
-const tokensRef = ref(database, '/' );
-onValue(tokensRef, (snapshot) => {
+const tokensRef: DatabaseReference = ref(database, '/' );
+onValue(tokensRef, (snapshot: DataSnapshot): void => {
     tokens = snapshot.val();
-})
+});
 
-async function updateTokens(access_token, refresh_token) {
+export async function updateTokens(access_token: string, refresh_token: string): Promise<void> {
     set(ref(database, '/'), {
-        access_token: tokensResponseJson.access_token,
-        refresh_token: tokensResponseJson.refresh_token
+        access_token: access_token,
+        refresh_token: refresh_token
     })
-    .then(() => {
-        fetch(process.env.AMO_API_URL + "api/v4/leads", {
-            headers: {
-                Authorization: `Bearer ${tokensResponseJson.access_token}`
-                }
-            })
-
-        if (leads.status !== 401) {
-            return leads.ok ? leads.json() : `Response error: ${leads.status}`
-        }
-    })
-    .catch((error) => {
-    // The write failed...
-    });
-}
+};
