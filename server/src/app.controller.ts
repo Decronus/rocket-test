@@ -8,6 +8,6 @@ export class AppController {
 
     @Get('/')
     getLeads() {
-        return this.appService.getLeads()
+        return this.appService.getMainData()
     }
 }
