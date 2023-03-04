@@ -35,7 +35,7 @@ export class AppService {
                 const tokensResponseJson: Tokens = await updateTokensResponse.json();
                 updateTokens(tokensResponseJson.access_token, tokensResponseJson.refresh_token);
 
-                const leads = await fetch(process.env.AMO_API_URL + "api/v4/leads", {
+                const leads: Response = await fetch(process.env.AMO_API_URL + "api/v4/leads", {
                         headers: {
                             Authorization: `Bearer ${tokensResponseJson.access_token}`
                             }
