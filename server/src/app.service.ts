@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { AxiosResponse } from "axios";
 import { tokens, updateTokens } from "firebase";
 import { Tokens, UpdateTokensBody } from "interfaces";
 import Queries from './queries.service'
@@ -8,7 +9,7 @@ export class AppService {
     async getMainData() {
         let mainData: any[] = []
 
-        const leads = await Queries.getLeads();
+        const leads: AxiosResponse = await Queries.getLeads();
 
         if (leads.status !== 401 && leads.statusText === "OK") {
 
@@ -17,6 +18,7 @@ export class AppService {
                     name: null,
                     price: null,
                     responsible_user_id: null,
+                    status_id: null,
                     status_name: null,
                     status_color: null
                 }
@@ -24,23 +26,24 @@ export class AppService {
                 leadObj.name = lead.name;
                 leadObj.price = lead.price;
                 leadObj.responsible_user_id = lead.responsible_user_id;
+                leadObj.status_id = lead.status_id;
 
                 mainData.push(leadObj);
 
                 console.log(mainData)
             })
 
-            const pipeline = await Queries.getPipelineByID("6531006")
+            const pipeline: AxiosResponse = await Queries.getPipelineByID("6531006")
 
-            pipeline.data._embedded.statuses.forEach(status => {
-                const index: number = pipeline.data._embedded.statuses.indexOf(status)
-                console.log('pipelinedata', status)
-                console.log(typeof index)
-                console.log("mainData", mainData)
-                console.log("mainData[index]", mainData[index])
-                console.log("mainData[0]", mainData[0])
-                mainData[0].status_name = status.name;
-                mainData[0].status_color = status.color;
+            mainData.forEach((lead) => {
+               const leadStatus = pipeline.data._embedded.statuses.find((status) => {
+                    return status.id === lead.status_id
+                })
+                // console.log("lead", lead)
+                // console.log("leadStatus", leadStatus);
+                // console.log("mainData[lead]", mainData[mainData.indexOf(lead)]);
+                mainData[mainData.indexOf(lead)].status_name = leadStatus.name;
+                mainData[mainData.indexOf(lead)].status_color = leadStatus.color;
             })
 
             return mainData;
@@ -53,7 +56,7 @@ export class AppService {
                 refresh_token: `${tokens.refresh_token}`,
                 redirect_uri: "https://localhost.com"
             };
-            const updateTokensResponse = await Queries.postUpdateTokenResponse(body);
+            const updateTokensResponse: AxiosResponse = await Queries.postUpdateTokenResponse(body);
 
             if (updateTokensResponse.statusText === "OK") {
                 updateTokens(updateTokensResponse.data.access_token, updateTokensResponse.data.refresh_token);
