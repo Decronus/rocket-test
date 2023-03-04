@@ -5,14 +5,52 @@ import { Tokens, UpdateTokensBody } from "interfaces";
 @Injectable()
 export class AppService {
     async getLeads() {
+        let mainData = []
+
         const leads: Response = await fetch(process.env.AMO_API_URL + "api/v4/leads", {
             headers: {
                 Authorization: `Bearer ${tokens.access_token}`
                 }
             });
+        const leadsJson = await leads.json()
 
-        if (leads.status !== 401) {
-            return leads.ok ? leads.json() : `Response error: ${leads.status}`;
+        if (leads.status !== 401 && leads.ok) {
+            // return leads.ok ? leads.json() : `Response error: ${leads.status}`;
+            leadsJson._embedded.leads.forEach((lead) => {
+                let leadObj = {
+                    name: null,
+                    price: null,
+                    responsible_user_id: null,
+                    status_name: null,
+                    status_color: null
+                }
+
+                leadObj.name = lead.name;
+                leadObj.price = lead.price;
+                leadObj.responsible_user_id = lead.responsible_user_id;
+
+                mainData.push(leadObj);
+
+                console.log(mainData)
+            })
+
+            const pipeline: Response = await fetch(process.env.AMO_API_URL + "api/v4/leads/pipelines/6531006", {
+                headers: {
+                    Authorization: `Bearer ${tokens.access_token}`
+                    }
+                });
+            const pipelineJson = await pipeline.json();
+            console.log("pipelineJson", pipelineJson)
+
+            pipelineJson._embedded.statuses.forEach(status => {
+                const index: number = pipelineJson._embedded.statuses.indexOf(status)
+                console.log(index)
+                console.log("mainData[index]", mainData[index])
+                mainData[0].status_name = status.name;
+                mainData[0].status_color = status.color;
+            })
+
+            return mainData;
         } else {
 
             const body: UpdateTokensBody = {
@@ -37,7 +75,7 @@ export class AppService {
 
                 const leads: Response = await fetch(process.env.AMO_API_URL + "api/v4/leads", {
                         headers: {
-                            Authorization: `Bearer ${tokensResponseJson.access_token}`
+                            Authorization: `Bearer ${tokens.access_token}`
                             }
                         });
 
