@@ -56,10 +56,11 @@ async function fillMainData(mainData: Array<MainDataElement>, leads: any): Promi
 
 @Injectable()
 export class AppService {
-    async getMainData() {
+    async getMainData(query: string) {
         let mainData: Array<any> = []
 
-        const leads: AxiosResponse = await Queries.getLeads();
+        const leads: AxiosResponse = await Queries.getLeads(query);
+        console.log('req', leads.request)
 
         if (leads.status !== 401) {
 
@@ -80,7 +81,7 @@ export class AppService {
             if (updateTokensResponse.statusText === "OK") {
                 updateTokens(updateTokensResponse.data.access_token, updateTokensResponse.data.refresh_token);
 
-                const leads: AxiosResponse = await Queries.getLeads();
+                const leads: AxiosResponse = await Queries.getLeads(query);
 
                 await fillMainData(mainData, leads)
                 return mainData;

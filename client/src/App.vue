@@ -84,17 +84,30 @@ export default defineComponent({
     },
 
     methods: {
-        onSearch() {
+        onSearch(searchValue: string): void {
+            this.fetchData(searchValue);
+        },
+
+        fetchData(searchValue: string): void {
+            this.dataLoading = true;
             this.searchLoading = true;
+            axios(`http://127.0.0.1:3008/?query=${searchValue}`)
+                .then((mainData) => {
+                    this.data = mainData.data;
+                    this.dataLoading = false;
+                    this.searchLoading = false;
+                })
+                .catch((err) => {
+                    this.data = null;
+                    this.dataLoading = false;
+                    this.searchLoading = false;
+                    console.log(err);
+                });
         },
     },
 
     mounted() {
-        this.dataLoading = true;
-        axios("http://127.0.0.1:3008/").then((mainData) => {
-            this.data = mainData.data;
-            this.dataLoading = false;
-        });
+        this.fetchData(this.searchValue);
     },
 });
 </script>

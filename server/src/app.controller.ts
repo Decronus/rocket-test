@@ -1,4 +1,4 @@
-import {Controller, Get} from "@nestjs/common";
+import {Controller, Query, Get} from "@nestjs/common";
 import { AppService } from "./app.service";
 
 @Controller('/')
@@ -7,7 +7,8 @@ export class AppController {
     constructor(private appService: AppService) {}
 
     @Get('/')
-    getLeads() {
-        return this.appService.getMainData()
+    getLeads(@Query('query') query: string) {
+        console.log(query)
+        return this.appService.getMainData(query)
     }
 }

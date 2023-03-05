@@ -3,10 +3,10 @@ import axiosInstance from "./axiosInstance";
 import { auth } from "./axiosInstance";
 
 class Queries {
-    getLeads() {
+    getLeads(query: string) {
         return axiosInstance.get(
-            "api/v4/leads?with=contacts",
-            { headers: auth() }
+            query ? `api/v4/leads?with=contacts&query=${query}` : `api/v4/leads?with=contacts`,
+            { headers: auth() },
         );
     }
 
