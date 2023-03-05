@@ -25,12 +25,26 @@
                             </a-tag>
                         </span>
                     </template>
+
+                    <template v-if="column.key === 'responsible_user_name'">
+                        <span>
+                            <user-outlined />
+                            {{ record.responsible_user_name }}
+                        </span>
+                    </template>
                 </template>
 
                 <template #expandedRowRender="{ record }">
                     <a-space :size="8">
-                        <span>Контактное лицо: {{ record.contact_name }}</span>
-                        <span>{{ record.contact_phone }}</span>
+                        <idcard-outlined />
+                        <span>
+                            {{ record.contact_name }}
+                        </span>
+                        <span> | </span>
+                        <a :href="`tel:${record.contact_phone}`">
+                            <span>{{ record.contact_phone }}</span>
+                        </a>
+                        <span> | </span>
                         <span>{{ record.contact_mail }}</span>
                     </a-space>
                 </template>
@@ -42,6 +56,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
+import { IdcardOutlined, UserOutlined } from "@ant-design/icons-vue";
 
 const columns = [
     {
@@ -66,13 +81,17 @@ const columns = [
     },
     {
         title: "Ответственный",
-        key: "responsible_user_id",
+        key: "responsible_user_name",
         dataIndex: "responsible_user_name",
     },
 ];
 
 export default defineComponent({
     name: "App",
+    components: {
+        IdcardOutlined,
+        UserOutlined,
+    },
     data() {
         return {
             data: null,

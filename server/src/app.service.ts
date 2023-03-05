@@ -60,7 +60,6 @@ export class AppService {
         let mainData: Array<any> = []
 
         const leads: AxiosResponse = await Queries.getLeads(query);
-        console.log('req', leads.request)
 
         if (leads.status !== 401) {
 
