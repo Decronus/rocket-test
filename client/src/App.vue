@@ -15,86 +15,61 @@
             </a-col>
         </a-row>
 
-        <a-table :columns="columns" :data-source="data">
-            <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'status'">
-                    <span>
-                        <a-tag :color="'green'">
-                            {{ record.status }}
-                        </a-tag>
-                    </span>
+        <a-spin :spinning="dataLoading" size="large">
+            <a-table :columns="columns" :data-source="data">
+                <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'status_name'">
+                        <span>
+                            <a-tag :color="record.status_color">
+                                {{ record.status_name }}
+                            </a-tag>
+                        </span>
+                    </template>
                 </template>
-            </template>
 
-            <template #expandedRowRender="{ record }">
-                <p style="margin: 0">Контактное лицо: {{ record.contact }}</p>
-            </template>
-        </a-table>
+                <template #expandedRowRender="{ record }">
+                    <a-space :size="8">
+                        <span>Контактное лицо: {{ record.contact_name }}</span>
+                        <span>{{ record.contact_phone }}</span>
+                        <span>{{ record.contact_mail }}</span>
+                    </a-space>
+                </template>
+            </a-table>
+        </a-spin>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
-import { MainDataElement } from "./types";
 
 const columns = [
     {
         title: "Название",
-        dataIndex: "name",
-        key: "name",
+        dataIndex: "lead_name",
+        key: "lead_name",
     },
     {
         title: "Статус",
-        dataIndex: "status",
-        key: "status",
+        dataIndex: "status_name",
+        key: "status_name",
     },
     {
         title: "Бюджет",
-        dataIndex: "budget",
-        key: "budget",
+        dataIndex: "price",
+        key: "price",
     },
     {
         title: "Дата создания",
-        key: "date",
-        dataIndex: "date",
+        key: "created_at",
+        dataIndex: "created_at",
     },
     {
         title: "Ответственный",
-        key: "responsible",
-        dataIndex: "responsible",
+        key: "responsible_user_id",
+        dataIndex: "responsible_user_name",
     },
 ];
-
-// const data = [
-//     {
-//         key: "1",
-//         name: "Разработка сайта",
-//         status: "Первичный контакт",
-//         budget: "150000₽",
-//         date: "27.02.23",
-//         responsible: "Сергеев В.В.",
-//         contact: "89991150041",
-//     },
-//     {
-//         key: "2",
-//         name: "Упаковка соцсети",
-//         status: "Продажа",
-//         budget: "15000₽",
-//         date: "27.02.23",
-//         responsible: "Петренко А.С.",
-//         contact: "89991150041",
-//     },
-//     {
-//         key: "3",
-//         name: "Ведение соцсети",
-//         status: "Переговоры",
-//         budget: "300000₽",
-//         date: "27.02.23",
-//         responsible: "Бутова М.В.",
-//         contact: "89991150041",
-//     },
-// ];
 
 export default defineComponent({
     name: "App",
@@ -104,6 +79,7 @@ export default defineComponent({
             columns,
             searchValue: "",
             searchLoading: false,
+            dataLoading: false,
         };
     },
 
@@ -114,9 +90,11 @@ export default defineComponent({
     },
 
     mounted() {
-        axios("http://127.0.0.1:3008/").then(
-            (mainData) => (this.data = mainData.data)
-        );
+        this.dataLoading = true;
+        axios("http://127.0.0.1:3008/").then((mainData) => {
+            this.data = mainData.data;
+            this.dataLoading = false;
+        });
     },
 });
 </script>
@@ -129,11 +107,11 @@ export default defineComponent({
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+    font-family: "Helvetica Neue";
 }
 body {
     padding: 20px;
     background: #fcfcfc;
-    font-family: "Helvetica Neue";
 }
 
 .ant-table-thead .ant-table-cell {
@@ -142,6 +120,10 @@ body {
 
 .ant-row {
     margin-bottom: 20px;
+}
+
+.ant-tag.ant-tag-has-color {
+    color: #333333;
 }
 
 @media (max-width: 700px) {

@@ -6,7 +6,7 @@ export interface MainDataElement {
     contact_phone: string,
     contact_mail: string,
     lead_name: string,
-    price: number,
+    price: string,
     responsible_user_id: number,
     responsible_user_name: string,
     status_id: number,

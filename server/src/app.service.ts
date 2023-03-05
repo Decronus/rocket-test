@@ -7,6 +7,7 @@ import Queries from './queries.service'
 async function fillMainData(mainData: Array<MainDataElement>, leads: any): Promise<void>  {
     leads.data._embedded.leads.forEach((lead: any) => {
         let leadObj: MainDataElement = {
+            key: leads.data._embedded.leads.indexOf(lead),
             created_at: new Date(lead.created_at * 1000).toLocaleDateString(),
             pipeline_id: lead.pipeline_id,
             contact_id: lead._embedded.contacts[0].id,
@@ -14,7 +15,7 @@ async function fillMainData(mainData: Array<MainDataElement>, leads: any): Promi
             contact_phone: null,
             contact_mail: null,
             lead_name: lead.name,
-            price: lead.price,
+            price: `${lead.price} ₽`,
             responsible_user_id: lead.responsible_user_id,
             responsible_user_name: null,
             status_id: lead.status_id,
