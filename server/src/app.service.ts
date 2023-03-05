@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { AxiosResponse } from "axios";
 import { tokens, updateTokens } from "firebase";
-import { Tokens, UpdateTokensBody, MainDataElement } from "interfaces";
+import { Tokens, UpdateTokensBody, MainDataElement } from "types";
 import Queries from './queries.service'
 
 @Injectable()
@@ -15,9 +15,11 @@ export class AppService {
 
             leads.data._embedded.leads.forEach((lead: any) => {
                 let leadObj: MainDataElement = {
-                    name: lead.name,
-                    price: lead.price,
+                    created_at: new Date(lead.created_at * 1000).toLocaleDateString(),
                     pipeline_id: lead.pipeline_id,
+                    contact_id: lead._embedded.contacts[0].id,
+                    lead_name: lead.name,
+                    price: lead.price,
                     responsible_user_id: lead.responsible_user_id,
                     responsible_user_name: null,
                     status_id: lead.status_id,
@@ -45,6 +47,15 @@ export class AppService {
                  mainData[mainData.indexOf(lead)].responsible_user_name = responsibleUser.name;
              })
 
+             const contacts: AxiosResponse  = await Queries.getContacts();
+             mainData.forEach((lead) => {
+                const contact = contacts.data._embedded.contacts.find((contact_el: any) => {
+                     return contact_el.id === lead.contact_id
+                 });
+                 mainData[mainData.indexOf(lead)].contact_name = contact.name;
+                 mainData[mainData.indexOf(lead)].contact_phone = contact.custom_fields_values[0].values[0].value;
+                 mainData[mainData.indexOf(lead)].contact_mail = contact.custom_fields_values[1].values[0].value;
+             })
 
             return mainData;
         } else {

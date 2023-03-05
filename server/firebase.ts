@@ -1,6 +1,6 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, set, DatabaseReference, Database, DataSnapshot } from "firebase/database";
-import { Tokens } from "interfaces";
+import { Tokens } from "types";
 
 const firebaseConfig = {
     databaseURL:

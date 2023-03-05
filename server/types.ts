@@ -12,9 +12,11 @@ export interface UpdateTokensBody {
 };
 
 export interface MainDataElement {
-    name: string,
-    price: number,
+    created_at: string,
     pipeline_id: number,
+    contact_id: number,
+    lead_name: string,
+    price: number,
     responsible_user_id: number,
     responsible_user_name: string,
     status_id: number,
