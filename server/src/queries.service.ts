@@ -10,7 +10,7 @@ class Queries {
         );
     }
 
-    getPipelineByID(id: string) {
+    getPipelineByID(id: number) {
         return axiosInstance.get(
             `api/v4/leads/pipelines/${id}`,
             { headers: auth() }

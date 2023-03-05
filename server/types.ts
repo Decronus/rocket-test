@@ -14,7 +14,10 @@ export interface UpdateTokensBody {
 export interface MainDataElement {
     created_at: string,
     pipeline_id: number,
+    contact_name: string,
     contact_id: number,
+    contact_phone: string,
+    contact_mail: string,
     lead_name: string,
     price: number,
     responsible_user_id: number,
