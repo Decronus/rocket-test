@@ -1,38 +1,42 @@
 <template>
-    <a-row type="flex" justify="space-between">
-        <a-col>
-            <a-typography-title :level="4">Cделки</a-typography-title>
-        </a-col>
-        <a-col>
-            <a-input-search
-                v-model:value="searchValue"
-                placeholder="Поиск по сделкам"
-                style="width: 200px"
-                :loading="searchLoading"
-                @search="onSearch"
-            />
-        </a-col>
-    </a-row>
+    <div>
+        <a-row type="flex" justify="space-between">
+            <a-col>
+                <a-typography-title :level="4">Cделки</a-typography-title>
+            </a-col>
+            <a-col>
+                <a-input-search
+                    v-model:value="searchValue"
+                    placeholder="Поиск по сделкам"
+                    style="width: 200px"
+                    :loading="searchLoading"
+                    @search="onSearch"
+                />
+            </a-col>
+        </a-row>
 
-    <a-table :columns="columns" :data-source="data">
-        <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'status'">
-                <span>
-                    <a-tag :color="'green'">
-                        {{ record.status }}
-                    </a-tag>
-                </span>
+        <a-table :columns="columns" :data-source="data">
+            <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'status'">
+                    <span>
+                        <a-tag :color="'green'">
+                            {{ record.status }}
+                        </a-tag>
+                    </span>
+                </template>
             </template>
-        </template>
 
-        <template #expandedRowRender="{ record }">
-            <p style="margin: 0">Контактное лицо: {{ record.contact }}</p>
-        </template>
-    </a-table>
+            <template #expandedRowRender="{ record }">
+                <p style="margin: 0">Контактное лицо: {{ record.contact }}</p>
+            </template>
+        </a-table>
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import axios from "axios";
+import { MainDataElement } from "./types";
 
 const columns = [
     {
@@ -62,41 +66,41 @@ const columns = [
     },
 ];
 
-const data = [
-    {
-        key: "1",
-        name: "Разработка сайта",
-        status: "Первичный контакт",
-        budget: "150000₽",
-        date: "27.02.23",
-        responsible: "Сергеев В.В.",
-        contact: "89991150041",
-    },
-    {
-        key: "2",
-        name: "Упаковка соцсети",
-        status: "Продажа",
-        budget: "15000₽",
-        date: "27.02.23",
-        responsible: "Петренко А.С.",
-        contact: "89991150041",
-    },
-    {
-        key: "3",
-        name: "Ведение соцсети",
-        status: "Переговоры",
-        budget: "300000₽",
-        date: "27.02.23",
-        responsible: "Бутова М.В.",
-        contact: "89991150041",
-    },
-];
+// const data = [
+//     {
+//         key: "1",
+//         name: "Разработка сайта",
+//         status: "Первичный контакт",
+//         budget: "150000₽",
+//         date: "27.02.23",
+//         responsible: "Сергеев В.В.",
+//         contact: "89991150041",
+//     },
+//     {
+//         key: "2",
+//         name: "Упаковка соцсети",
+//         status: "Продажа",
+//         budget: "15000₽",
+//         date: "27.02.23",
+//         responsible: "Петренко А.С.",
+//         contact: "89991150041",
+//     },
+//     {
+//         key: "3",
+//         name: "Ведение соцсети",
+//         status: "Переговоры",
+//         budget: "300000₽",
+//         date: "27.02.23",
+//         responsible: "Бутова М.В.",
+//         contact: "89991150041",
+//     },
+// ];
 
 export default defineComponent({
     name: "App",
     data() {
         return {
-            data,
+            data: null,
             columns,
             searchValue: "",
             searchLoading: false,
@@ -107,6 +111,12 @@ export default defineComponent({
         onSearch() {
             this.searchLoading = true;
         },
+    },
+
+    mounted() {
+        axios("http://127.0.0.1:3008/").then(
+            (mainData) => (this.data = mainData.data)
+        );
     },
 });
 </script>
