@@ -2,16 +2,31 @@
     <div>
         <a-row type="flex" justify="space-between">
             <a-col>
-                <a-typography-title :level="4">Cделки</a-typography-title>
+                <a-typography-title :level="3">Cделки</a-typography-title>
             </a-col>
-            <a-col>
-                <a-input-search
-                    v-model:value="searchValue"
-                    placeholder="Поиск по сделкам"
-                    style="width: 200px"
-                    :loading="searchLoading"
-                    @search="onSearch"
-                />
+            <a-col align="middle">
+                <a-row>
+                    <a-space>
+                        <a-tooltip v-if="inputError">
+                            <template #title
+                                >Введите минимум 3 символа</template
+                            >
+
+                            <warning-two-tone
+                                v-if="inputError"
+                                :style="{ fontSize: '20px' }"
+                                two-tone-color="#eb3f36"
+                            />
+                        </a-tooltip>
+                        <a-input-search
+                            v-model:value="searchValue"
+                            placeholder="Поиск по сделкам"
+                            style="width: 200px"
+                            :loading="searchLoading"
+                            @search="onSearch"
+                        />
+                    </a-space>
+                </a-row>
             </a-col>
         </a-row>
 
@@ -28,7 +43,6 @@
 
                     <template v-if="column.key === 'responsible_user_name'">
                         <span>
-                            <user-outlined />
                             {{ record.responsible_user_name }}
                         </span>
                     </template>
@@ -45,7 +59,9 @@
                             <span>{{ record.contact_phone }}</span>
                         </a>
                         <span> | </span>
-                        <span>{{ record.contact_mail }}</span>
+                        <a :href="`mailto:${record.contact_mail}`">
+                            <span>{{ record.contact_mail }}</span>
+                        </a>
                     </a-space>
                 </template>
             </a-table>
@@ -56,7 +72,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
-import { IdcardOutlined, UserOutlined } from "@ant-design/icons-vue";
+import {
+    IdcardOutlined,
+    UserOutlined,
+    WarningTwoTone,
+} from "@ant-design/icons-vue";
 
 const columns = [
     {
@@ -91,6 +111,7 @@ export default defineComponent({
     components: {
         IdcardOutlined,
         UserOutlined,
+        WarningTwoTone,
     },
     data() {
         return {
@@ -99,12 +120,18 @@ export default defineComponent({
             searchValue: "",
             searchLoading: false,
             dataLoading: false,
+            inputError: false,
         };
     },
 
     methods: {
         onSearch(searchValue: string): void {
-            this.fetchData(searchValue);
+            if (searchValue.length >= 1 && searchValue.length < 3) {
+                this.inputError = true;
+            } else {
+                this.inputError = false;
+                this.fetchData(searchValue);
+            }
         },
 
         fetchData(searchValue: string): void {
@@ -133,7 +160,6 @@ export default defineComponent({
 
 <style>
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
@@ -152,6 +178,10 @@ body {
 
 .ant-row {
     margin-bottom: 20px;
+}
+
+.ant-space {
+    margin-left: 50px;
 }
 
 .ant-tag.ant-tag-has-color {
