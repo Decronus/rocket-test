@@ -16,6 +16,13 @@ class Queries {
         );
     }
 
+    getUsers() {
+        return axiosInstance.get(
+            `/api/v4/users`,
+            { headers: auth() }
+        );
+    }
+
     postUpdateTokenResponse(body) {
         return axiosInstance.post(
             `oauth2/access_token`,
