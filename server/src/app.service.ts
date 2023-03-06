@@ -5,8 +5,9 @@ import { UpdateTokensBody, MainDataElement } from "types";
 import Queries from './queries.service'
 
 async function fillMainData(mainData: Array<MainDataElement>, leads: any): Promise<void>  {
+
     leads.data._embedded.leads.forEach((lead: any) => {
-        let leadObj: MainDataElement = {
+        const leadObj: MainDataElement = {
             key: leads.data._embedded.leads.indexOf(lead),
             created_at: new Date(lead.created_at * 1000).toLocaleDateString(),
             pipeline_id: lead.pipeline_id,
@@ -59,15 +60,16 @@ export class AppService {
     async getMainData(query: string) {
         let mainData: Array<any> = []
 
-        const leads: AxiosResponse = await Queries.getLeads(query);
+        try {
 
-        if (leads.status !== 401) {
-
-            await fillMainData(mainData, leads)
+            const leads: AxiosResponse = await Queries.getLeads(query);
+            await fillMainData(mainData, leads);
             return mainData;
 
-        } else {
+        }
+        catch(error) {
 
+            if (error.response.status === 401) {
             const body: UpdateTokensBody = {
                 client_id: process.env.CLIENT_ID,
                 client_secret: process.env.CLIENT_SECRET,
@@ -75,15 +77,14 @@ export class AppService {
                 refresh_token: `${tokens.refresh_token}`,
                 redirect_uri: "https://localhost.com"
             };
+
             const updateTokensResponse: AxiosResponse = await Queries.postUpdateTokenResponse(body);
+            updateTokens(updateTokensResponse.data.access_token, updateTokensResponse.data.refresh_token);
 
-            if (updateTokensResponse.statusText === "OK") {
-                updateTokens(updateTokensResponse.data.access_token, updateTokensResponse.data.refresh_token);
+            const leads: AxiosResponse = await Queries.getLeads(query);
+            await fillMainData(mainData, leads);
+            return mainData;
 
-                const leads: AxiosResponse = await Queries.getLeads(query);
-
-                await fillMainData(mainData, leads)
-                return mainData;
             }
         }
     }
